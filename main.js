@@ -1,7 +1,13 @@
-import * as g from './my-module.js';
+import * as Shapes from './shapes';
 
-const root = document.getElementById('root');
 
-root.textContent = 'abc';
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
 
-window.x = g;
+canvas.onmousemove = function(evt) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const t = new Shapes.Tank(100, 100);
+  t.faceTo(evt.offsetX, evt.offsetY);
+  t.draw(ctx);
+
+}
