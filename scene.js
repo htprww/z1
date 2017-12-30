@@ -1,32 +1,32 @@
 import {Tank, Target} from './shapes';
 
-const arr = [];
-const n = 200;
-for (let i = 0; i < n; i++) {
-  arr.push(new Target());
-}
-
 export const scene = {
-  one: new Tank(100, 100),
-  targets: arr,
+  init() {
+    this.one = new Tank(100, 100);
+    this.targets = [];
+    const canvas = document.getElementById('canvas');
+    const n = 200;
+    for (let i = 0; i < n; i++) {
+      let x = Math.random() * canvas.width;
+      let y = Math.random() * canvas.height;
+      this.targets.push(new Target(x, y));
+    }
+  },
 
   update(mouse, fps) {
     this.one.update(input, fps);
+    this.targets.forEach(t => t.update());
     detect(this.one, this.targets);
   },
 
-  cleanup() {
-    this.one.cleanup();
-    this.targets = this.targets.filter(function(t) {
-      return t.alive;
-    });
+  cleanup(canvas) {
+    this.one.cleanup(canvas);
+    this.targets = this.targets.filter(t => t.alive);
   },
 
   render(ctx) {
+    this.targets.forEach(t => t.render(ctx));
     this.one.render(ctx);
-    this.targets.forEach(function(t) {
-      t.render(ctx);
-    });
   }
 };
 

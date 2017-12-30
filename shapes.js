@@ -247,27 +247,26 @@ export class Tank {
       this.y = max;
     }
 
-    this.bullets.forEach(function(b) {
-      b.update(fps);
-    });
+    this.bullets.forEach(b => b.update(fps));
   }
 
-  cleanup() {
-    this.bullets = this.bullets.filter(function(b) {
-      const canvas = document.getElementById('canvas');
-      return b.alive && b.x > 0 && b.x < canvas.width &&
-                        b.y > 0 && b.y < canvas.height;
-    });
+  cleanup(canvas) {
+    this.bullets = this.bullets.filter(b =>
+      b.alive && b.x > 0 && b.x < canvas.width &&
+      b.y > 0 && b.y < canvas.height
+    );
   }
 }
 
 export class Target {
-  constructor(x = null, y = null) {
-    const canvas = document.getElementById('canvas');
-    this.x = x || Math.floor(Math.random() * 1000);
-    this.y = y || Math.floor(Math.random() * 1000);
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
     this.size = 10;
     this.alive = true;
+    this.dx = 0;
+    this.dy = 0;
+    this.speed = Math.random() * 2;
   }
 
   render(ctx) {
@@ -277,6 +276,12 @@ export class Target {
   }
 
   update(fps) {
+    if (Math.random() < 0.001) {
+      this.dx = (0.5 - Math.random()) * this.speed;
+      this.dy = (0.5 - Math.random()) * this.speed;
+    }
 
+    this.x += this.dx;
+    this.y += this.dy;
   }
 }

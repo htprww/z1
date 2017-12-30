@@ -32,6 +32,7 @@ document.onkeyup = function(evt) {
 
 frame.time = Date.now();
 
+scene.init();
 window.requestAnimationFrame(frame);
 
 function frame() {
@@ -42,12 +43,8 @@ function frame() {
 
 
   scene.update(input, fps);
-  scene.cleanup();
-  // ctx.save();
-  // ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-  // ctx.fillRect(0, 0, canvas.width, canvas.height);
+  scene.cleanup(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // ctx.restore();
   scene.render(ctx);
 
   // delay();
