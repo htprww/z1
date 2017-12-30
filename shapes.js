@@ -1,3 +1,8 @@
+import {rgbToHsv, hsvToRgb} from './utils';
+
+window.rgbToHsv = rgbToHsv;
+window.hsvToRgb = hsvToRgb;
+
 const FPS = 60;
 
 class Point {
@@ -52,16 +57,17 @@ class Bullet {
     this.y = t.y + 2 * t.size * Math.sin(t.theta);
 
     this.size = 2;
-    this.speed = 200;
+    this.speed = 3;
 
-    const delta = this.speed / FPS;
-    this.dx = t.dx + delta * Math.cos(t.theta);
-    this.dy = t.dy + delta * Math.sin(t.theta);
+    this.dx = t.dx / 2 + this.speed * Math.cos(t.theta);
+    this.dy = t.dy / 2 + this.speed * Math.sin(t.theta);
+
+    this.dmg = t.dmg;
   }
 
   update(fps) {
-    this.x += this.dx * FPS / fps;
-    this.y += this.dy * FPS / fps;
+    this.x += this.dx;
+    this.y += this.dy;
   }
 
   render(ctx) {
@@ -80,25 +86,44 @@ export class Tank {
 
     this.size = 10;
 
-    this.speed = 3;
+    this.speed = 1;
     this.accel = 0.05;
 
     this.dx = 0;
     this.dy = 0;
 
     this.bullets = [];
+
+    this.hp = 100;
+    this.dmg = 10;
   }
 
   render(ctx) {
     ctx.save();
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 1;
+
     ctx.translate(this.x, this.y);
     ctx.rotate(this.theta);
     ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(2 * this.size, 0);
-    ctx.moveTo(this.size, 0);
+    ctx.moveTo(2 * this.size, 0);
+    ctx.lineTo(this.size, 0);
     ctx.arc(0, 0, this.size, 0, 2 * Math.PI);
     ctx.stroke();
+
+    const green = rgbToHsv(0, 255, 0);
+    const red = rgbToHsv(255, 0, 0);
+    const ratio = this.hp / 100;
+    const mix = green[0] * ratio;
+    const color = hsvToRgb(mix, 1, 1);
+    // ctx.strokeStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+    ctx.lineWidth = 4;
+    const r = this.size - 4;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.arc(0, 0, r, 0, 2 * Math.PI * ratio);
+    ctx.stroke();
+
     ctx.restore();
 
     this.bullets.forEach(function(b) {
@@ -128,34 +153,51 @@ export class Tank {
   }
 
   update(input, fps) {
-    console.log(`${this.dx} ${this.dy}`);
+    // console.log(`${this.dx} ${this.dy}`);
 
     this.faceTo(input.x, input.y);
 
     const acc = this.accel;
+    const isqrt2 = 1 / Math.sqrt(2);
 
     let ax = 0;
     let ay = 0;
     if (input.right === 1) {
-      ax = acc;
+      if (input.up === 1 || input.down === 1) {
+        ax = acc * isqrt2;
+      } else {
+        ax = acc;
+      }
     }
     if (input.left === 1) {
-      ax = -acc;
+      if (input.up === 1 || input.down === 1) {
+        ax = -acc * isqrt2;
+      } else {
+        ax = -acc;
+      }
     }
     if (input.down === 1) {
-      ay = acc;
+      if (input.left === 1 || input.right === 1) {
+        ay = acc * isqrt2;
+      } else {
+        ay = acc;
+      }
     }
     if (input.up === 1) {
-      ay = -acc;
+      if (input.left === 1 || input.right === 1) {
+        ay = -acc * isqrt2;
+      } else {
+        ay = -acc;
+      }
     }
 
     let dx = 0;
     if (ax === 0) {
       if (this.dx > 0) {
-        dx = this.dx - acc;
+        dx = this.dx - acc / 4;
         dx = Math.max(dx, 0);
       } else if (this.dx < 0) {
-        dx = this.dx + acc;
+        dx = this.dx + acc / 4;
         dx = Math.min(dx, 0);
       }
     } else {
@@ -165,10 +207,10 @@ export class Tank {
     let dy = 0;
     if (ay === 0) {
       if (this.dy > 0) {
-        dy = this.dy - acc;
+        dy = this.dy - acc / 4;
         dy = Math.max(dy, 0);
       } else if (this.dy < 0) {
-        dy = this.dy + acc;
+        dy = this.dy + acc / 4;
         dy = Math.min(dy, 0);
       }
     } else {
