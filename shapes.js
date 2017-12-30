@@ -59,10 +59,11 @@ class Bullet {
     this.size = 2;
     this.speed = 3;
 
-    this.dx = t.dx / 2 + this.speed * Math.cos(t.theta);
-    this.dy = t.dy / 2 + this.speed * Math.sin(t.theta);
+    this.dx = t.dx / 3 + this.speed * Math.cos(t.theta);
+    this.dy = t.dy / 3 + this.speed * Math.sin(t.theta);
 
     this.dmg = t.dmg;
+    this.alive = true;
   }
 
   update(fps) {
@@ -71,10 +72,12 @@ class Bullet {
   }
 
   render(ctx) {
-    ctx.beginPath();
-    ctx.moveTo(this.x + this.size, this.y);
-    ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
-    ctx.stroke();
+    if (this.alive) {
+      ctx.beginPath();
+      ctx.moveTo(this.x + this.size, this.y);
+      ctx.arc(this.x, this.y, this.size, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
   }
 }
 
@@ -247,11 +250,33 @@ export class Tank {
     this.bullets.forEach(function(b) {
       b.update(fps);
     });
+  }
 
+  cleanup() {
     this.bullets = this.bullets.filter(function(b) {
       const canvas = document.getElementById('canvas');
-      return b.x > 0 && b.x < canvas.width &&
-      b.y > 0 && b.y < canvas.height;
+      return b.alive && b.x > 0 && b.x < canvas.width &&
+                        b.y > 0 && b.y < canvas.height;
     });
+  }
+}
+
+export class Target {
+  constructor(x = null, y = null) {
+    const canvas = document.getElementById('canvas');
+    this.x = x || Math.floor(Math.random() * 1000);
+    this.y = y || Math.floor(Math.random() * 1000);
+    this.size = 10;
+    this.alive = true;
+  }
+
+  render(ctx) {
+    if (this.alive) {
+      ctx.strokeRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+    }
+  }
+
+  update(fps) {
+
   }
 }
