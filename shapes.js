@@ -1,9 +1,8 @@
 import {rgbToHsv, hsvToRgb} from './utils';
+import {Trace} from './trace';
 
 window.rgbToHsv = rgbToHsv;
 window.hsvToRgb = hsvToRgb;
-
-const FPS = 60;
 
 class Point {
   constructor(x = 0, y = 0) {
@@ -138,20 +137,7 @@ export class Tank {
     this.theta = Math.atan2(y - this.y, x - this.x);
   }
 
-  moveTo(x, y) {
-    this.destX = x;
-    this.destY = y;
-
-    const dx = x - this.x;
-    const dy = y - this.y;
-    const d = Math.sqrt(dx * dx + dy * dy);
-
-    const ds = this.speed / FPS;
-    this.dx = ds * dx /d;
-    this.dy = ds * dy / d;
-  }
-
-  fire() {
+    fire() {
     this.bullets.push(new Bullet(this));
   }
 
@@ -264,9 +250,8 @@ export class Target {
     this.y = y;
     this.size = 10;
     this.alive = true;
-    this.dx = 0;
-    this.dy = 0;
-    this.speed = Math.random() * 2;
+
+    this.trace = new Trace(x, y);
   }
 
   render(ctx) {
@@ -276,12 +261,12 @@ export class Target {
   }
 
   update(fps) {
-    if (Math.random() < 0.001) {
-      this.dx = (0.5 - Math.random()) * this.speed;
-      this.dy = (0.5 - Math.random()) * this.speed;
-    }
+    this.trace.update();
+    this.x = this.trace.x;
+    this.y = this.trace.y;
 
-    this.x += this.dx;
-    this.y += this.dy;
+    if (this.trace.duration === 0) {
+      this.trace = new Trace(this.x, this.y);
+    }
   }
 }

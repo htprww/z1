@@ -1,14 +1,14 @@
 import {Tank, Target} from './shapes';
+import * as config from './config';
 
 export const scene = {
   init() {
     this.one = new Tank(100, 100);
     this.targets = [];
-    const canvas = document.getElementById('canvas');
-    const n = 200;
+    const n = 50;
     for (let i = 0; i < n; i++) {
-      let x = Math.random() * canvas.width;
-      let y = Math.random() * canvas.height;
+      let x = Math.random() * config.WIDTH;
+      let y = Math.random() * config.HEIGHT;
       this.targets.push(new Target(x, y));
     }
   },

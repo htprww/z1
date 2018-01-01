@@ -1,10 +1,14 @@
 import {scene} from './scene';
 import {controller as input} from './controller';
+import * as config from './config';
 
 window.input = input;
 window.scene = scene;
 
 const canvas = document.getElementById('canvas');
+canvas.width = config.WIDTH;
+canvas.height = config.HEIGHT;
+
 const ctx = canvas.getContext('2d');
 window.ctx = ctx;
 
@@ -17,16 +21,15 @@ canvas.onmousemove = function(evt) {
 }
 canvas.onmousedown = function(evt) {
   scene.one.fire()
-  // scene.one.moveTo(evt.offsetX, evt.offsetY);
 }
 
 document.onkeydown = function(evt) {
-  evt.preventDefault();
+  // evt.preventDefault();
   input.pressKey(evt.key);
 }
 
 document.onkeyup = function(evt) {
-  evt.preventDefault();
+  // evt.preventDefault();
   input.releaseKey(evt.key);
 }
 
@@ -52,7 +55,7 @@ function frame() {
   const now2 = Date.now();
   const time = now2 - now;
   const real = Math.floor(1000 / time)
-  info.textContent = `FPS: ${fps}, Real: ${real}, Time: ${time}`;
+  info.innerHTML = `FPS: ${fps} <br> Real: ${real} <br> Time: ${time} <br> Target: ${scene.targets.length}`;
 
   window.requestAnimationFrame(frame);
 }
